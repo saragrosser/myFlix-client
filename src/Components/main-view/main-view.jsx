@@ -1,39 +1,35 @@
 // Import React and useState hook
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MovieCard } from "./Components/movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
 
 export const MainView = () => {
   // Studio Ghibli movies data
-  const [movies, setMovies] = useState([
-    {
-      title: "My Neighbor Totoro",
-      description:
-        "When two girls move to the country to be near their ailing mother, they have adventures with the wondrous forest spirits who live nearby.",
-      image: "https://m.media-amazon.com/images/I/91Rd6IjcSWL._SY466_.jpg",
-    },
-    {
-      title: "Spirited Away",
-      description:
-        "During her family's move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods, witches, and spirits, and where humans are changed into beasts.",
-      image: "https://m.media-amazon.com/images/I/612y4XapwkL._AC_SX679_.jpg",
-    },
-    {
-      title: "Princess Mononoke",
-      description:
-        "On a journey to find the cure for a Tatarigami's curse, Ashitaka finds himself in the middle of a war between the forest gods and Tatara, a mining colony.",
-      image: "https://m.media-amazon.com/images/I/81jSJRqb9IL._SY466_.jpg",
-    },
-    {
-      title: "Howl's Moving Castle",
-      description:
-        "When an unconfident young woman is cursed with an old body by a spiteful witch, her only chance of breaking the spell lies with a self-indulgent yet insecure young wizard and his companions in his legged, walking castle.",
-      image: "https://m.media-amazon.com/images/I/61SVQF6opUL._AC_SX679_.jpg",
-    },
-    // Add more movie objects when needed
-  ]);
+  const [movies, setMovies] = useState([]);
 
   const [selectedMovie, setSelectedMovie] = useState(null);
+
+  useEffect(() => {
+    fetch("https://movie-ghibli-api-60afc8eabe21.herokuapp.com/movies")
+      .then((response) => response.json())
+      .then((moviesData) => {
+        const moviesFromApi = moviesData.map((movie) => {
+          return {
+            id: movie._id,
+            title: movie.title,
+            description: movie.description,
+            image: movie.image,
+            director: movie.director,
+            // Add any other movie details to include
+          };
+        });
+
+        setMovies(moviesFromApi);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch movies:", error);
+      });
+  }, []);
 
   if (selectedMovie) {
     return (
