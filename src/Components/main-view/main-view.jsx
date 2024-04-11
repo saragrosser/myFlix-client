@@ -3,17 +3,25 @@ import React, { useState, useEffect } from "react";
 import { MovieCard } from "./Components/movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
 import { LoginView } from "../login-view/login-view";
+import { SignupView } from "../signup-view/signup-view";
 
 export const MainView = () => {
-  // Studio Ghibli movies data
+  //Movie data
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const storedToken = localStorage.getItem("token");
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(storedUser ? storedUser : null);
+  const [token, setToken] = useState(storedToken ? storedToken : null);
 
   useEffect(() => {
+    if (!token) {
+      return;
+    }
     fetch("https://movie-ghibli-api-60afc8eabe21.herokuapp.com/movies")
       .then((response) => response.json())
       .then((moviesData) => {
+        console.log("Movies data: ", data);
         const moviesFromApi = moviesData.map((movie) => {
           return {
             id: movie._id,
@@ -26,67 +34,55 @@ export const MainView = () => {
         });
 
         setMovies(moviesFromApi);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch movies:", error);
       });
-  }, []);
+  }, [token]);
 
   if (!user) {
-    return <LoginView onLoggedIn={(user) => setUser(user)} />;
-  }
-
-  if (selectedMovie) {
     return (
       <>
-        <button
-          onClick={() => {
-            setUser(null);
+        <LoginView
+          onLoggedIn={(user, token) => {
+            setUser(user);
+            setToken(token);
           }}
-        >
-          Logout
-        </button>
-        <MovieView
-          movie={selectedMovie}
-          onBackClick={() => setSelectedMovie(null)}
         />
+        or
+        <SignupView />
       </>
     );
   }
-
-  if (movies.length === 0) {
+  if (selectedMovie) {
+    // console.log(selectedMovie);
     return (
-      <>
-        <button
-          onClick={() => {
-            setUser(null);
-          }}
-        >
-          Logout
-        </button>
-        <div>The list is empty!</div>
-      </>
+      <MovieView
+        movie={selectedMovie}
+        onBackClick={() => setSelectedMovie(null)}
+      />
     );
   }
-
+  if (movies.length === 0) {
+    return <div>The list is empty!</div>;
+  }
   return (
     <div>
-      <button
-        onClick={() => {
-          setUser(null);
-        }}
-      >
-        Logout
-      </button>
       {movies.map((movie) => (
         <MovieCard
-          key={movie._id} //movies have a unique "_id" field
+          key={movie.id}
           movie={movie}
           onMovieClick={(newSelectedMovie) => {
             setSelectedMovie(newSelectedMovie);
           }}
         />
       ))}
+      <button
+        onClick={() => {
+          setUser(null);
+          setToken(null);
+          localStorage.clear();
+        }}
+      >
+        Logout
+      </button>
     </div>
   );
 };
