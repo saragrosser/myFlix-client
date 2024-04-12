@@ -16,7 +16,7 @@ export const SignupView = () => {
       birthDate: birthday,
     };
 
-    fetch("https://movie-ghibli-api-60afc8eabe21.herokuapp.com/signup", {
+    fetch("https://movie-ghibli-api-60afc8eabe21.herokuapp.com/login", {
       method: "POST",
       body: JSON.stringify(data),
       headers: {
