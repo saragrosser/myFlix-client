@@ -1,4 +1,7 @@
+import React from "react";
 import { useState } from "react";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 
 export const SignupView = () => {
   const [username, setUsername] = useState("");
@@ -8,15 +11,17 @@ export const SignupView = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const isoDate = new Date(birthday).toISOString(); // Convert date to ISO string format
 
     const data = {
-      username: username,
-      password: password,
-      email: email,
-      birthDate: birthday,
+      Username: username, // Note the capital 'U' as used in the API backend
+      Password: password,
+      Email: email,
+      Birthday: isoDate,
     };
 
-    fetch("https://movie-ghibli-api-60afc8eabe21.herokuapp.com/signup", {
+    fetch("https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users", {
+      // Adjusted endpoint to /users
       method: "POST",
       body: JSON.stringify(data),
       headers: {
@@ -33,45 +38,54 @@ export const SignupView = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Username:
-        <input
+    <Form onSubmit={handleSubmit}>
+      <br />
+      <h1> Create an account </h1>
+      <Form.Group controlId="formUsername">
+        <Form.Label>Username:</Form.Label>
+        <Form.Control
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
-          minLength="3"
+          minLength={3}
         />
-      </label>
-      <label>
-        Password:
-        <input
+      </Form.Group>
+      <br />
+      <Form.Group controlId="formPassword">
+        <Form.Label>Password:</Form.Label>
+        <Form.Control
           type="password"
+          minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-      </label>
-      <label>
-        Email:
-        <input
+      </Form.Group>
+      <br />
+      <Form.Group controlId="formEmail">
+        <Form.Label> Email: </Form.Label>
+        <Form.Control
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-      </label>
-      <label>
-        Birthday:
-        <input
+      </Form.Group>
+      <Form.Group controlId="formBirthday">
+        <Form.Label> Birthday: </Form.Label>
+        <Form.Control
           type="date"
           value={birthday}
           onChange={(e) => setBirthday(e.target.value)}
           required
         />
-      </label>
-      <button type="submit">Submit</button>
-    </form>
+      </Form.Group>
+      <br />
+      <Button variant="primary" type="submit">
+        {" "}
+        Sign up{" "}
+      </Button>
+    </Form>
   );
 };

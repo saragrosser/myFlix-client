@@ -1,10 +1,16 @@
+import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
+import "./index.scss"; // Import custom styles
+import Container from "react-bootstrap/Container";
+
 import { createRoot } from "react-dom/client";
 import { MainView } from "./Components/main-view/main-view";
 
-import "./index.scss";
-
 const App = () => {
-  return <MainView />;
+  return (
+    <Container>
+      <MainView />
+    </Container>
+  );
 };
 
 const container = document.querySelector("#root");
