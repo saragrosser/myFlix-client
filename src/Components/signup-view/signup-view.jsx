@@ -11,16 +11,17 @@ export const SignupView = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const isoDate = new Date(birthday);
+    const isoDate = new Date(birthday).toISOString(); // Convert date to ISO string format
 
     const data = {
-      username: username,
-      password: password,
-      email: email,
+      Username: username, // Note the capital 'U' as used in the API backend
+      Password: password,
+      Email: email,
       Birthday: isoDate,
     };
 
-    fetch("https://movie-ghibli-api-60afc8eabe21.herokuapp.com/signup", {
+    fetch("https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users", {
+      // Adjusted endpoint to /users
       method: "POST",
       body: JSON.stringify(data),
       headers: {
