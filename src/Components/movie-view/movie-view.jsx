@@ -1,11 +1,17 @@
-import PropTypes from "prop-types";
-import Button from "react-bootstrap/Button";
+import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import "./movie-view.scss";
 
-export const MovieView = ({ movie, onBackClick }) => {
+export const MovieView = ({ movies }) => {
+  const { movieId } = useParams();
+  const movie = movies.find((movie) => movie.id === movieId);
+
+  if (!movie) return <div>Movie not found!</div>; // Handle case where movie is not found
+
   return (
     <div>
       <div>
-        <img height={300} src={movie.image} />
+        <img height={300} src={movie.image} alt={movie.title} />
       </div>
       <div>
         <span>Title: </span>
@@ -17,26 +23,15 @@ export const MovieView = ({ movie, onBackClick }) => {
       </div>
       <div>
         <span>Genre: </span>
-        <span>{movie.genre + " "}</span>
+        <span>{movie.genre}</span>
       </div>
       <div>
         <span>Director: </span>
         <span>{movie.director}</span>
       </div>
-      {/* <div>
-        <span>Featured: </span>
-        <span>{movie.featured}</span>
-      </div> */}
-      <Button onClick={onBackClick}> Back </Button>
+      <Link to="/">
+        <button className="back-button">Back</button>
+      </Link>
     </div>
   );
-};
-MovieView.propTypes = {
-  movie: PropTypes.shape({
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    genre: PropTypes.array,
-    director: PropTypes.string,
-  }).isRequired,
-  onBackClick: PropTypes.func.isRequired,
 };
