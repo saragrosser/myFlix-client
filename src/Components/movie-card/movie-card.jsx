@@ -13,6 +13,12 @@ export const MovieCard = ({ movie }) => {
         <Link to={`/movies/${encodeURIComponent(movie.id)}`}>
           <Button variant="link">Open</Button>
         </Link>
+        <Button
+          variant="outline-primary"
+          onClick={() => handleFavorite(movie.id)}
+        >
+          {isFavorite ? "Unfavorite" : "Favorite"}
+        </Button>
       </Card.Body>
     </Card>
   );
