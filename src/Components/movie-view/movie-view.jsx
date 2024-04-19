@@ -4,33 +4,35 @@ import "./movie-view.scss";
 
 export const MovieView = ({ movies }) => {
   const { movieId } = useParams();
-  const movie = movies.find((movie) => movie.id === movieId);
+  const movie = movies.find((m) => m._id === movieId);
 
   if (!movie) return <div>Movie not found!</div>; // Handle case where movie is not found
 
   return (
-    <div>
-      <div>
-        <img height={300} src={movie.image} alt={movie.title} />
+    <div className="movie-view">
+      <div className="movie-poster">
+        <img src={movie.imagePath} alt={`The cover of ${movie.title}`} />
       </div>
-      <div>
-        <span>Title: </span>
-        <span>{movie.title}</span>
+      <div className="movie-title">
+        <span className="label">Title: </span>
+        <span className="value">{movie.title}</span>
       </div>
-      <div>
-        <span>Description: </span>
-        <span>{movie.description}</span>
+      <div className="movie-description">
+        <span className="label">Description: </span>
+        <span className="value">{movie.description}</span>
       </div>
-      <div>
-        <span>Genre: </span>
-        <span>{movie.genre}</span>
+      <div className="movie-genre">
+        <span className="label">Genre: </span>
+        <span className="value">{movie.genre.Name}</span>
       </div>
-      <div>
-        <span>Director: </span>
-        <span>{movie.director}</span>
+      <div className="movie-director">
+        <span className="label">Director: </span>
+        <span className="value">{movie.director.Name}</span>
       </div>
       <Link to="/">
-        <button className="back-button">Back</button>
+        <button type="button" className="btn btn-primary back-button">
+          Back
+        </button>
       </Link>
     </div>
   );

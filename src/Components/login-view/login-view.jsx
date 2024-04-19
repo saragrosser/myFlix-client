@@ -12,7 +12,7 @@ export const LoginView = ({ onLoggedIn }) => {
     event.preventDefault();
 
     const data = {
-      UserName: username,
+      Username: username,
       Password: password,
     };
 
@@ -23,10 +23,16 @@ export const LoginView = ({ onLoggedIn }) => {
       },
       body: JSON.stringify(data),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
       .then((data) => {
         console.log("Login response: ", data);
-        if (data.user) {
+        if (data.user && data.token) {
+          // Ensure data contains user and token
           localStorage.setItem("user", JSON.stringify(data.user));
           localStorage.setItem("token", data.token);
           onLoggedIn(data.user, data.token);
@@ -36,7 +42,7 @@ export const LoginView = ({ onLoggedIn }) => {
       })
       .catch((e) => {
         console.error("Login error: ", e);
-        alert("Something went wrong");
+        alert("Login failed");
       });
   };
   return (

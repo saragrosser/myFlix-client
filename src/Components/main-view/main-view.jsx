@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { MovieCard } from "./Components/movie-card/movie-card";
+import { MovieCard } from "../movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
 import { LoginView } from "../login-view/login-view";
 import { SignupView } from "../signup-view/signup-view";
-import { NavigationBar } from "../navigation-bar/navigation-bar.jsx";
+import { NavigationBar } from "../navigation-bar/navigation-bar";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { ProfileView } from "../profile-view/profile-view.jsx";
-import "./main-view.scss";
+import { ProfileView } from "../profile-view/profile-view";
 
 export const MainView = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -29,13 +28,14 @@ export const MainView = () => {
         console.log(data);
         const moviesFromApi = data.map((movie) => ({
           id: movie._id,
-          title: movie.title,
-          description: movie.description,
-          image: movie.image,
-          director: movie.director,
+          title: movie.Title,
+          description: movie.Description,
+          image: movie.Image,
+          director: movie.Director,
           genre: movie.Genre,
         }));
         setMovies(moviesFromApi);
+        console.log("Updated movies state:", moviesFromApi);
       })
       .catch((error) => {
         console.error("Fetch error:", error);
@@ -118,7 +118,9 @@ export const MainView = () => {
                       <Col className="mb-5" key={movie.id} md={3} sm={12}>
                         <MovieCard
                           movie={movie}
-                          isFavorite={user.favoriteMovies.includes(movie.title)}
+                          isFavorite={user?.favoriteMovies?.includes(
+                            movie.title
+                          )}
                         />
                       </Col>
                     ))}

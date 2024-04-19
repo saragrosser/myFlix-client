@@ -6,19 +6,20 @@ import { Link } from "react-router-dom";
 export const MovieCard = ({ movie }) => {
   return (
     <Card>
-      <Card.Img variant="top" src={movie.image} alt={movie.title} />
+      <Card.Img variant="top" src={movie.imagePath} alt={movie.title} />
       <Card.Body>
         <Card.Title>{movie.title}</Card.Title>
-        <Card.Text>{movie.genre}</Card.Text>
-        <Link to={`/movies/${encodeURIComponent(movie.id)}`}>
+        <Card.Text>{movie.genre.Name}</Card.Text>
+        <Link to={`/movies/${encodeURIComponent(movie._id)}`}>
           <Button variant="link">Open</Button>
         </Link>
+        {/* Uncomment when I have handleFavorite and isFavorite logic ready
         <Button
           variant="outline-primary"
-          onClick={() => handleFavorite(movie.id)}
+          onClick={() => handleFavorite(movie._id)}
         >
           {isFavorite ? "Unfavorite" : "Favorite"}
-        </Button>
+        </Button> */}
       </Card.Body>
     </Card>
   );
@@ -26,11 +27,19 @@ export const MovieCard = ({ movie }) => {
 
 MovieCard.propTypes = {
   movie: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    _id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
-    image: PropTypes.string,
-    genre: PropTypes.string,
-    director: PropTypes.string,
+    imagePath: PropTypes.string.isRequired,
+    genre: PropTypes.shape({
+      Name: PropTypes.string.isRequired,
+      Description: PropTypes.string,
+    }),
+    director: PropTypes.shape({
+      Name: PropTypes.string.isRequired,
+      Bio: PropTypes.string,
+      Birth: PropTypes.string,
+      Death: PropTypes.string,
+    }),
   }).isRequired,
 };
