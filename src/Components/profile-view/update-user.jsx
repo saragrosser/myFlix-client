@@ -1,14 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 
-export const UpdateUser = ({
-  formData,
-  handleUpdate,
-  handleSubmit,
-  handleDeleteAccount,
-}) => {
+export const UpdateUser = ({ user, onUpdate, onDelete }) => {
+  const [formData, setFormData] = useState({
+    username: user ? user.username : "",
+    password: "",
+    email: user ? user.email : "",
+    birthDate: user && user.birthDate ? user.birthDate.slice(0, 10) : "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onUpdate(formData);
+  };
+
   return (
     <Row>
       <Form onSubmit={handleSubmit}>

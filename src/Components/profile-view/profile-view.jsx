@@ -9,10 +9,10 @@ export const ProfileView = ({ localUser, token, movies }) => {
   const [favoriteMovies, setFavoriteMovies] = useState([]);
 
   useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     if (!token) return;
     fetch(
-      "https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/" +
-        localUser.username,
+      `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${storedUser.UserName}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -24,53 +24,19 @@ export const ProfileView = ({ localUser, token, movies }) => {
           movies.filter((m) => data.FavoriteMovies.includes(m._id))
         );
       })
-      .catch((error) => {
-        console.error("Error fetching user data:", error);
-      });
-  }, [token, movies, localUser.username]);
-
-  const handleFavorite = (movieId) => {
-    const isFavorite = user.FavoriteMovies.includes(movieId);
-    const updatedFavorites = isFavorite
-      ? user.FavoriteMovies.filter((id) => id !== movieId)
-      : [...user.FavoriteMovies, movieId];
-
-    fetch(
-      "https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/" +
-        user.username +
-        "/movies",
-      {
-        method: isFavorite ? "DELETE" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ movieId: movieId }),
-      }
-    )
-      .then((response) => response.json())
-      .then((updatedUser) => {
-        setUser(updatedUser);
-        setFavoriteMovies(
-          movies.filter((m) => updatedUser.FavoriteMovies.includes(m._id))
-        );
-      })
-      .catch((error) => console.error("Failed to update favorites:", error));
-  };
+      .catch((error) => console.error("Error fetching user data:", error));
+  }, [token, movies, user.username]);
 
   const handleUpdateUser = (updatedData) => {
-    fetch(
-      "https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/" +
-        user.username,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updatedData),
-      }
-    )
+    if (!user) return;
+    fetch(`https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedData),
+    })
       .then((response) => response.json())
       .then((updatedUser) => {
         setUser(updatedUser);
@@ -84,9 +50,9 @@ export const ProfileView = ({ localUser, token, movies }) => {
   };
 
   const handleDeregister = () => {
+    if (!user) return;
     fetch(
-      "https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/" +
-        user.username,
+      `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${user.username}`,
       {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
@@ -101,11 +67,9 @@ export const ProfileView = ({ localUser, token, movies }) => {
           alert("Failed to delete account.");
         }
       })
-      .catch((error) => {
-        console.error("Error deleting account:", error);
-      });
+      .catch((error) => console.error("Error deleting account:", error));
   };
-
+  if (!user) return <div>Loading user data...</div>;
   return (
     <Container>
       <Row>
@@ -126,10 +90,7 @@ export const ProfileView = ({ localUser, token, movies }) => {
           </Card>
           <Card>
             <Card.Body>
-              <FavouriteMovies
-                movies={favoriteMovies}
-                handleFavorite={handleFavorite}
-              />
+              <FavouriteMovies user={user} favoriteMovies={favoriteMovies} />
             </Card.Body>
           </Card>
         </Col>

@@ -23,7 +23,12 @@ export const MainView = () => {
     fetch("https://movie-ghibli-api-60afc8eabe21.herokuapp.com/movies", {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("HTTP status " + response.status);
+        }
+        return response.json();
+      })
       .then((data) => {
         console.log(data);
         const moviesFromApi = data.map((movie) => ({
