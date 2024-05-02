@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import "./movie-view.scss";
+import PropTypes from "prop-types";
 
 export const MovieView = ({ movies }) => {
   const { movieId } = useParams();
@@ -9,31 +9,59 @@ export const MovieView = ({ movies }) => {
   if (!movie) return <div>Movie not found!</div>; // Handle case where movie is not found
 
   return (
-    <div className="movie-view">
-      <div className="movie-poster">
-        <img src={movie.imagePath} alt={`The cover of ${movie.title}`} />
+    <div>
+      <div>
+        <img
+          src={movie.image}
+          className="img-fluid  justify-content-md-center"
+          alt="Movie Poster"
+        />
       </div>
-      <div className="movie-title">
-        <span className="label">Title: </span>
-        <span className="value">{movie.title}</span>
+      <div>
+        <span style={{ fontWeight: "bold" }}>Title: </span>
+        <span style={{ fontWeight: "bold" }}>{movie.title}</span>
       </div>
-      <div className="movie-description">
-        <span className="label">Description: </span>
-        <span className="value">{movie.description}</span>
+      <div>
+        <span>Description: </span>
+        <span>{movie.description}</span>
       </div>
-      <div className="movie-genre">
-        <span className="label">Genre: </span>
-        <span className="value">{movie.genre.Name}</span>
+      <div>
+        <span>Genre: </span>
+        <span>{movie.genre}</span>
       </div>
-      <div className="movie-director">
-        <span className="label">Director: </span>
-        <span className="value">{movie.director.Name}</span>
+      <div>
+        <span>Director: </span>
+        <span>{movie.director}</span>
       </div>
-      <Link to="/">
-        <button type="button" className="btn btn-primary back-button">
-          Back
-        </button>
+      <div>
+        <span>Featured: </span>
+        <span>{movie.featured ? "True" : "False"}</span>
+      </div>
+      <Link to={`/`}>
+        <button className="back-button">Back</button>
       </Link>
     </div>
   );
+};
+
+MovieView.propTypes = {
+  movies: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.shape({
+        $oid: PropTypes.string,
+      }),
+      title: PropTypes.string,
+      description: PropTypes.string,
+      Genre: PropTypes.shape({
+        Name: PropTypes.string,
+        Description: PropTypes.string,
+      }),
+      director: PropTypes.shape({
+        Name: PropTypes.string,
+        Bio: PropTypes.string,
+        Birth: PropTypes.string,
+        Death: PropTypes.string,
+      }),
+    })
+  ).isRequired,
 };

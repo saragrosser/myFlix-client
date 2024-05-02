@@ -1,83 +1,137 @@
-import React, { useState } from "react";
 import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 import { Button, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "./movie-card.scss";
 
-export const MovieCard = ({ movie, onFavoriteToggle, isFavorite }) => {
+export const MovieCard = ({ movie, isFavorite }) => {
   const storedToken = localStorage.getItem("token");
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const [user, setUser] = useState(storedUser ? storedUser : null);
+  const [token, setToken] = useState(storedToken ? storedToken : null);
 
-  const handleFavoriteClick = () => {
-    const method = isFavorite ? "DELETE" : "POST";
-    const url = `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${
-      movie._id
-    }/${isFavorite ? "remove" : "add"}Favorite`;
+  const [addTitle, setAddTitle] = useState("");
+  const [delTitle, setDelTitle] = useState("");
 
-    fetch(url, {
-      method: method,
-      headers: {
-        Authorization: `Bearer ${storedToken}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to update favorites");
+  useEffect(() => {
+    const addToFavorites = () => {
+      fetch(
+        `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${
+          user.username
+        }/movies/${encodeURIComponent(movie.title)}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
-        return response.json();
-      })
-      .then(() => {
-        onFavoriteToggle(movie._id); // Assuming onFavoriteToggle updates the state in the parent component
-      })
-      .catch((error) => {
-        console.error("Error updating favorite status:", error);
-        alert("Failed to update favorites.");
-      });
+      )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to add movie to favorites.");
+          }
+          alert("Movie added to favorites successfully!");
+          window.location.reload();
+          return response.json();
+        })
+        .then((updatedUser) => {
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          setUser(updatedUser);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    };
+
+    const removeFromFavorites = () => {
+      fetch(
+        `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${
+          user.username
+        }/movies/${encodeURIComponent(movie.title)}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to remove movie from favorites.");
+          }
+          alert("Movie removed from favorites successfully!");
+          window.location.reload();
+          return response.json();
+        })
+        .then((user) => {
+          if (user) {
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+            setUser(updatedUser);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    };
+
+    if (addTitle) {
+      addToFavorites();
+    }
+    if (delTitle) {
+      removeFromFavorites();
+    }
+  }, [addTitle, delTitle, token, user.username]);
+
+  const handleAddToFavorites = () => {
+    setAddTitle(movie.title);
+  };
+  const handleRemoveFromFavorites = () => {
+    setDelTitle(movie.title);
   };
 
   return (
-    <Card className="mb-3">
-      <Link to={`/movies/${encodeURIComponent(movie._id)}`}>
-        <Card.Img variant="top" src={movie.imagePath} />
+    <>
+      <Link
+        to={`/movies/${encodeURIComponent(movie._id)}`}
+        className="movie-view"
+      >
+        <Card className="h-100">
+          <Card.Img
+            variant="top"
+            src={movie.image}
+            className="object-fit-cover"
+          />
+          <Card.Body>
+            <Card.Title>{movie.title}</Card.Title>
+            <Card.Text>{movie.genre.Name}</Card.Text>
+          </Card.Body>
+        </Card>
       </Link>
-      <Card.Body>
-        <Card.Title>{movie.title}</Card.Title>
-        <Card.Text>{movie.description}</Card.Text>
-        <Button
-          variant="link"
-          as={Link}
-          to={`/movies/${encodeURIComponent(movie._id)}`}
-        >
-          Open
-        </Button>
-        <Button
-          variant={isFavorite ? "danger" : "success"}
-          onClick={handleFavoriteClick}
-        >
-          {isFavorite ? "Unfavorite" : "Favorite"}
-        </Button>
-      </Card.Body>
-    </Card>
+      <Card>
+        {isFavorite ? (
+          <Button variant="primary" onClick={handleRemoveFromFavorites}>
+            Remove
+          </Button>
+        ) : (
+          <Button variant="primary" onClick={handleAddToFavorites}>
+            Add
+          </Button>
+        )}
+      </Card>
+    </>
   );
 };
 
-MovieCard.propTypes = {
-  movie: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    imagePath: PropTypes.string.isRequired,
-    genre: PropTypes.shape({
-      Name: PropTypes.string,
-      Description: PropTypes.string,
-    }),
-    director: PropTypes.shape({
-      Name: PropTypes.string,
-      Bio: PropTypes.string,
-      Birth: PropTypes.string,
-      Death: PropTypes.string,
-    }),
-  }).isRequired,
-  onFavoriteToggle: PropTypes.func.isRequired,
-  isFavorite: PropTypes.bool.isRequired,
-};
+movie: PropTypes.shape({
+  _id: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  image: PropTypes.string.isRequired,
+  description: PropTypes.string,
+  genre: PropTypes.shape({
+    Name: PropTypes.string,
+  }),
+  director: PropTypes.string,
+  featured: PropTypes.bool,
+}).isRequired;

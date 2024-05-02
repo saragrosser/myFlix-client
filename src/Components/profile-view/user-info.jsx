@@ -1,9 +1,16 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-export const UserInfo = ({ user }) => (
-  <div>
-    <h4>User Information</h4>
-    <p>Username: {user.username}</p>
-    <p>Email: {user.email}</p>
-  </div>
-);
+export const UserInfo = ({ email, name }) => {
+  return (
+    <>
+      <p>Username: {name} </p>
+      <p>Email: {email} </p>
+    </>
+  );
+};
+
+UserInfo.propTypes = {
+  email: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+};
