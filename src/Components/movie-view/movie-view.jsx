@@ -6,6 +6,8 @@ export const MovieView = ({ movies }) => {
   const { movieId } = useParams();
   const movie = movies.find((m) => m._id === movieId);
 
+  console.log("Movie Id: ", movieId);
+
   if (!movie) return <div>Movie not found!</div>; // Handle case where movie is not found
 
   return (
@@ -27,11 +29,11 @@ export const MovieView = ({ movies }) => {
       </div>
       <div>
         <span>Genre: </span>
-        <span>{movie.genre}</span>
+        <span>{movie.genre.Name}</span>
       </div>
       <div>
         <span>Director: </span>
-        <span>{movie.director}</span>
+        <span>{movie.director.Name}</span>
       </div>
       <div>
         <span>Featured: </span>
@@ -47,9 +49,7 @@ export const MovieView = ({ movies }) => {
 MovieView.propTypes = {
   movies: PropTypes.arrayOf(
     PropTypes.shape({
-      _id: PropTypes.shape({
-        $oid: PropTypes.string,
-      }),
+      _id: PropTypes.string,
       title: PropTypes.string,
       description: PropTypes.string,
       Genre: PropTypes.shape({

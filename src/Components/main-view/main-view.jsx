@@ -31,12 +31,12 @@ export const MainView = () => {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
+        console.log("Fetching data:", data);
         const moviesFromApi = data.map((movie) => ({
-          id: movie._id,
+          _id: movie._id,
           title: movie.Title,
           description: movie.Description,
-          image: movie.Image,
+          image: movie.ImagePath,
           director: movie.Director,
           genre: movie.Genre,
         }));

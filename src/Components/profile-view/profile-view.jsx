@@ -132,8 +132,6 @@ export const ProfileView = ({ localUser, movies, token }) => {
           <Card.Body>
             <Card.Title>My Profile </Card.Title>
             <Card.Text>
-              {user && console.log("User:", user)}
-              {user && console.log("User Username:", user.username)}
               {user && <UserInfo name={user.username} email={user.email} />}
             </Card.Text>
           </Card.Body>
