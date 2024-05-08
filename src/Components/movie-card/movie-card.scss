@@ -1,0 +1,32 @@
+.card-shadow {
+  box-shadow: 5px 5px 15px 5px rgba(193, 228, 241, 0.445);
+
+  a {
+    text-decoration: none;
+  }
+
+  .card-title {
+    color: rgba(131, 226, 235, 0.477);
+  }
+
+  .card-text {
+    color: rgba(131, 226, 235, 0.477) !important;
+  }
+}
+
+.card-img {
+  display: block;
+  width: 150px;
+  height: 400px;
+  object-fit: fill;
+}
+
+.fav-button {
+  cursor: pointer;
+  transition: 0.2s linear;
+  position: absolute;
+}
+
+.fav-button:hover {
+  transform: scale(1.2);
+}
