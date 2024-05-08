@@ -20529,17 +20529,15 @@ textarea.form-control-lg {
 }
 
 .card-shadow .card-title {
-  color: #83e2eb7a;
+  color: #eb83947a;
 }
 
 .card-shadow .card-text {
-  color: #83e2eb7a !important;
+  color: #5f465e7a !important;
 }
 
 .card-img {
   object-fit: fill;
-  width: 150px;
-  height: 400px;
   display: block;
 }
 
