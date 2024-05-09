@@ -1,33 +1,72 @@
+import { useState } from "react";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Col, Row, Container } from "react-bootstrap";
+import { Button, Card, Form } from "react-bootstrap";
+import { MovieCard } from "../movie-card/movie-card";
+import moment from "moment";
 import PropTypes from "prop-types";
-import { UserInfo } from "./user-info";
-import { UpdateUser } from "./update-user";
-import { FavouriteMovies } from "./favourite-movies";
-import { Card, Container, Row, Col, Button } from "react-bootstrap";
 
-export const ProfileView = ({ localUser, movies, token }) => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
+const ProfileView = ({ localUser, movies, token }) => {
+  const [user, setUser] = useState(
+    () => JSON.parse(localStorage.getItem("user")) || {}
+  );
+  const [formData, setFormData] = useState({
+    username: user.username || "",
+    email: user.email || "",
+    birthDate: user.birthDate
+      ? moment(user.birthDate).format("YYYY-MM-DD")
+      : "",
+    password: "", // Do not prefill passwords for security reasons
+  });
+  const [favoriteMovies, setFavoriteMovies] = useState([]);
 
-  const [username, setUsername] = useState(storedUser.username);
-  const [email, setEmail] = useState(storedUser.email);
-  const [password, setPassword] = useState(storedUser.password);
-  const [birthDate, setBirthdate] = useState(storedUser.birthDate);
-  const [user, setUser] = useState();
-  const favoriteMovies =
-    user === undefined
-      ? []
-      : movies.filter((m) => user.favoriteMovies.includes(m.title));
+  useEffect(() => {
+    if (!token || !localUser.Username) return; // Check if there's a valid token and username
 
-  const formData = {
-    username: username,
-    email: email,
-    birthDate: birthDate,
-    password: password,
-  };
-  const handleSubmit = (event) => {
-    event.preventDefault(event);
     fetch(
-      `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${user.username}`,
+      `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${localUser.Username}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("User not found or other error"); // Handle non-OK responses
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("User data fetched:", data);
+        setUser(data);
+        setFormData({
+          username: data.Username,
+          email: data.Email,
+          birthDate: moment(data.Birthday).format("YYYY-MM-DD"),
+          password: "", // Keep this empty
+        });
+        setFavoriteMovies(
+          movies.filter(
+            (movie) =>
+              data.FavoriteMovies && data.FavoriteMovies.includes(movie._id)
+          )
+        );
+        localStorage.setItem("user", JSON.stringify(data));
+      })
+      .catch((error) => {
+        console.error("Failed to fetch user data:", error);
+      });
+  }, [token, localUser.Username, movies]);
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleUpdate = (event) => {
+    event.preventDefault();
+    fetch(
+      `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${user.Username}`,
       {
         method: "PUT",
         body: JSON.stringify(formData),
@@ -38,121 +77,119 @@ export const ProfileView = ({ localUser, movies, token }) => {
       }
     )
       .then((response) => {
-        if (response.ok) {
-          alert("Update successful");
-          window.location.reload();
-
-          return response.json();
+        if (!response.ok) {
+          // This means the server responded with a non-successful HTTP status code
+          // We attempt to parse it as text since it might not be JSON
+          return response.text().then((text) => {
+            throw new Error(text || "Error occurred");
+          });
         }
-        alert("Update failed");
+        // If the response is ok, we handle it as JSON
+        return response.json();
       })
-      .then((user) => {
-        if (user) {
-          localStorage.setItem("user", JSON.stringify(user));
-          setUser(user);
-        }
+      .then((updatedUser) => {
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        alert("Update successful");
       })
       .catch((error) => {
-        console.error(error);
+        console.error("Update failed:", error);
+        alert(`Update failed: ${error.message}`);
       });
   };
 
-  const handleUpdate = (e) => {
-    switch (e.target.type) {
-      case "text":
-        setUsername(e.target.value);
-        break;
-      case "email":
-        setEmail(e.target.value);
-        break;
-      case "password":
-        setPassword(e.target.value);
-        break;
-      case "date":
-        setBirthdate(e.target.value);
-      default:
-    }
-  };
-
-  const handleDeleteAccount = () => {
+  const handleDelete = () => {
     fetch(
-      `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${storedUser.username}`,
+      `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${user.Username}`,
       {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: { Authorization: `Bearer ${token}` },
       }
-    ).then((response) => {
-      if (response.ok) {
-        alert("Account deleted successfully.");
-        localStorage.clear();
-        window.location.reload();
-      } else {
-        alert("Something went wrong.");
-      }
-    });
+    )
+      .then((response) => {
+        if (response.ok) {
+          localStorage.clear();
+          alert("Account deleted successfully.");
+          // Handle redirect if needed, e.g., using navigate('/')
+        } else {
+          alert("Deletion failed.");
+        }
+      })
+      .catch((error) => console.error("Deletion failed:", error));
   };
 
-  useEffect(() => {
-    if (!token) {
-      return;
-    }
-
-    fetch("https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Users data: ", data);
-        const usersFromApi = data.map((resultUser) => {
-          return {
-            id: resultUser._id,
-            username: resultUser.username,
-            password: resultUser.password,
-            email: resultUser.email,
-            birthDate: resultUser.birthDate,
-            favoriteMovies: resultUser.favoriteMovies,
-          };
-        });
-        setUser(usersFromApi.find((u) => u.username === localUser.username));
-
-        console.log("Profile Saved User: " + JSON.stringify(user));
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, [token]);
-
   return (
-    <Container className="profile-container">
+    <Container className="profile-container my-5">
       <Row>
-        <Card className="profile-card mb-5">
-          <Card.Body>
-            <Card.Title>My Profile</Card.Title>
-            <Card.Text>
-              {user && <UserInfo name={user.username} email={user.email} />}
-            </Card.Text>
-          </Card.Body>
-        </Card>
-        <Card className="profile-card mb-5">
-          <Card.Body>
-            <UpdateUser
-              formData={formData}
-              handleUpdate={handleUpdate}
-              handleSubmit={handleSubmit}
-              handleDeleteAccount={handleDeleteAccount}
-            />
-          </Card.Body>
-        </Card>
+        <Col md={4}>
+          <Card>
+            <Card.Body>
+              <Card.Title>My Profile</Card.Title>
+              <Card.Text>Username: {user.Username}</Card.Text>
+              <Card.Text>Email: {user.Email}</Card.Text>
+              <Card.Text>Birthday: {formData.birthDate}</Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={8}>
+          <Form onSubmit={handleUpdate}>
+            <Form.Group className="mb-3">
+              <Form.Label>Username</Form.Label>
+              <Form.Control
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Birthday</Form.Label>
+              <Form.Control
+                type="date"
+                name="birthDate"
+                value={formData.birthDate}
+                onChange={handleInputChange}
+                required
+              />
+            </Form.Group>
+            <Button variant="primary" type="submit">
+              Update
+            </Button>
+            <Button variant="danger" onClick={handleDelete} className="ms-2">
+              Delete Account
+            </Button>
+          </Form>
+        </Col>
       </Row>
       <Row>
-        <Col className="mb-5" xs={12} md={12}>
-          {favoriteMovies && (
-            <FavouriteMovies user={user} favoriteMovies={favoriteMovies} />
-          )}
-        </Col>
+        <h3>Favorite Movies</h3>
+        {favoriteMovies.length > 0 ? (
+          favoriteMovies.map((movie) => (
+            <Col sm={12} md={6} lg={4} key={movie._id}>
+              <MovieCard
+                movie={movie}
+                isFavorite={user.FavoriteMovies.includes(movie._id)}
+                onAddToFavorites={() => handleAddToFavorites(movie._id)}
+                onRemoveFromFavorites={() =>
+                  handleRemoveFromFavorites(movie._id)
+                }
+              />
+            </Col>
+          ))
+        ) : (
+          <p>No favorite movies to display.</p>
+        )}
       </Row>
     </Container>
   );
@@ -163,3 +200,5 @@ ProfileView.propTypes = {
   movies: PropTypes.array.isRequired,
   token: PropTypes.string.isRequired,
 };
+
+export default ProfileView;
