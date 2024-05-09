@@ -1,0 +1,77 @@
+.movie-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  width: 100%; // Use the full width available
+
+  .movie-content {
+    display: flex;
+    width: 90%;
+    max-width: 1200px; // Limits the maximum width, maintaining layout integrity on larger screens
+    margin: auto; // Centering the content horizontally
+
+    .movie-image-container {
+      width: 500%;
+      .movie-image {
+        width: 100%;
+        height: max-content;
+        object-fit: cover;
+      }
+    }
+
+    .movie-info {
+      width: 300%;
+      height: 300%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center; // Vertically centers the text content within the container
+
+      .movie-title,
+      .movie-description,
+      .movie-genre,
+      .movie-director,
+      .movie-featured {
+        margin-bottom: 10px;
+      }
+
+      .info-label {
+        font-weight: bold;
+        color: #5f9ea0;
+      }
+
+      .info-content {
+        color: #5f9ea0;
+        font-weight: normal;
+      }
+
+      .fav-button {
+        background-color: #5f9ea0;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: darken(#5f9ea0, 10%);
+        }
+      }
+    }
+  }
+
+  .back-button {
+    padding: 10px 20px;
+    background-color: #5f9ea0;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 20px;
+
+    &:hover {
+      background-color: darken(#5f9ea0, 10%);
+    }
+  }
+}

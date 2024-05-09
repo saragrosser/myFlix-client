@@ -126,17 +126,17 @@ export const ProfileView = ({ localUser, movies, token }) => {
   }, [token]);
 
   return (
-    <Container>
+    <Container className="profile-container">
       <Row>
-        <Card className="mb-5">
+        <Card className="profile-card mb-5">
           <Card.Body>
-            <Card.Title>My Profile </Card.Title>
+            <Card.Title>My Profile</Card.Title>
             <Card.Text>
               {user && <UserInfo name={user.username} email={user.email} />}
             </Card.Text>
           </Card.Body>
         </Card>
-        <Card className="mb-5">
+        <Card className="profile-card mb-5">
           <Card.Body>
             <UpdateUser
               formData={formData}

@@ -94,31 +94,38 @@ export const MovieCard = ({ movie, isFavorite }) => {
   return (
     <>
       <Card className="h-100 mt-5 card-shadow">
-        <Link to={`/movies/${encodeURIComponent(movie._id)}`}>
-          <Card.Img variant="top" src={movie.image} className="card-img" />
-          <Card.Body>
-            <Card.Title className="card-title">{movie.title}</Card.Title>
-            <Card.Text className="card-text">{movie.genre.Name}</Card.Text>
-          </Card.Body>
-        </Link>
+        <Card.Img variant="top" src={movie.image} className="card-img" />
+        <Card.Body>
+          {/* Wrap only the Card.Title with the Link */}
+          <Card.Title className="card-title">
+            <Link
+              to={`/movies/${encodeURIComponent(movie._id)}`}
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
+              {movie.title}
+            </Link>
+          </Card.Title>
+          <Card.Text className="card-text">{movie.genre.Name}</Card.Text>
+          {/* Display the appropriate button based on whether the movie is a favorite */}
+          {isFavorite ? (
+            <Button
+              className="remove-button"
+              variant="danger"
+              onClick={handleRemoveFromFavorites}
+            >
+              Remove from Favorites
+            </Button>
+          ) : (
+            <Button
+              className="fav-button"
+              variant="primary"
+              onClick={handleAddToFavorites}
+            >
+              Add to Favorites
+            </Button>
+          )}
+        </Card.Body>
       </Card>
-      {isFavorite ? (
-        <Button
-          className="fav-button"
-          variant="primary"
-          onClick={handleRemoveFromFavorites}
-        >
-          Remove
-        </Button>
-      ) : (
-        <Button
-          className="fav-button"
-          variant="primary"
-          onClick={handleAddToFavorites}
-        >
-          Add
-        </Button>
-      )}
     </>
   );
 };
