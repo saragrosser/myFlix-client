@@ -12,33 +12,40 @@ export const MovieView = ({ movies }) => {
   if (!movie) return <div>Movie not found!</div>; // Handle case where movie is not found
 
   return (
-    <div>
-      <div>
-        <img
-          src={movie.image}
-          className="img-fluid  justify-content-md-center"
-          alt="Movie Poster"
-        />
-      </div>
-      <div>
-        <span style={{ fontWeight: "bold" }}>Title: </span>
-        <span style={{ fontWeight: "bold" }}>{movie.title}</span>
-      </div>
-      <div>
-        <span>Description: </span>
-        <span>{movie.description}</span>
-      </div>
-      <div>
-        <span>Genre: </span>
-        <span>{movie.genre.Name}</span>
-      </div>
-      <div>
-        <span>Director: </span>
-        <span>{movie.director.Name}</span>
-      </div>
-      <div>
-        <span>Featured: </span>
-        <span>{movie.featured ? "True" : "False"}</span>
+    <div className="movie-view">
+      <div className="movie-content">
+        <div className="movie-image-container">
+          <img
+            src={movie.image}
+            className="img-fluid movie-image"
+            alt="Movie Poster"
+          />
+        </div>
+        <div className="movie-info">
+          <div className="movie-title">
+            <span className="info-label">Title: </span>
+            <span className="info-content">{movie.title}</span>
+          </div>
+          <div className="movie-description">
+            <span className="info-label">Description: </span>
+            <span className="info-content">{movie.description}</span>
+          </div>
+          <div className="movie-genre">
+            <span className="info-label">Genre: </span>
+            <span className="info-content">{movie.genre.Name}</span>
+          </div>
+          <div className="movie-director">
+            <span className="info-label">Director: </span>
+            <span className="info-content">{movie.director.Name}</span>
+          </div>
+          <div className="movie-featured">
+            <span className="info-label">Featured: </span>
+            <span className="info-content">
+              {movie.featured ? "True" : "False"}
+            </span>
+          </div>
+          <button className="fav-button">Add to Favorites</button>
+        </div>
       </div>
       <Link to={`/`}>
         <button className="back-button">Back</button>
