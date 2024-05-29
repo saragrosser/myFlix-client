@@ -16,6 +16,10 @@ This is a front web application that will provide users with access to informati
 - Parcel (v.2.10.2)
 - Process
 
+## Link to app
+
+Hosted on Netlify: https://studio-ghibli-client.netlify.app/
+
 ## Views
 
 ### Login View
@@ -46,4 +50,11 @@ This is a front web application that will provide users with access to informati
 - Allows users to update their info (username, email, date of birth)
 - Allows existing users to deregister
 - Displays favorite movies
+
   - Allows users to remove a movie from their list of favorites
+
+  ## Set up this App
+
+* Clone this repository
+* Navigate to the movie_api-client folder and run `npm install`
+* Run `parcel src/index.html`

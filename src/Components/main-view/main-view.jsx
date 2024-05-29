@@ -6,9 +6,40 @@ import { SignupView } from "../signup-view/signup-view";
 import { NavigationBar } from "../navigation-bar/navigation-bar";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProfileView from "../profile-view/profile-view";
+
+const MainLayout = ({
+  user,
+  filteredMovies,
+  searchQuery,
+  handleSearchChange,
+}) => (
+  <>
+    <Row className="justify-content-md-center mb-4">
+      <Col md={8}>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          placeholder="Search for movies..."
+          className="form-control"
+        />
+      </Col>
+    </Row>
+    <Row>
+      {filteredMovies.length === 0 ? (
+        <Col>No movies found!</Col>
+      ) : (
+        filteredMovies.map((movie) => (
+          <Col key={movie._id} md={3} sm={12} className="mb-3">
+            <MovieCard movie={movie} />
+          </Col>
+        ))
+      )}
+    </Row>
+  </>
+);
 
 export const MainView = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -63,17 +94,6 @@ export const MainView = () => {
           localStorage.clear();
         }}
       />
-      <Row className="justify-content-md-center mb-4">
-        <Col md={8}>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder="Search for movies..."
-            className="form-control"
-          />
-        </Col>
-      </Row>
       <Routes>
         <Route
           path="/signup"
@@ -104,16 +124,13 @@ export const MainView = () => {
           element={
             !user ? (
               <Navigate to="/login" replace />
-            ) : filteredMovies.length === 0 ? (
-              <Col>No movies found!</Col>
             ) : (
-              <Row>
-                {filteredMovies.map((movie, index) => (
-                  <Col key={movie._id} md={3} sm={12} className="mb-3">
-                    <MovieCard movie={movie} />
-                  </Col>
-                ))}
-              </Row>
+              <MainLayout
+                user={user}
+                filteredMovies={filteredMovies}
+                searchQuery={searchQuery}
+                handleSearchChange={handleSearchChange}
+              />
             )
           }
         />
