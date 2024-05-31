@@ -20,6 +20,55 @@ const ProfileView = ({ localUser, movies, token }) => {
   });
   const [favoriteMovies, setFavoriteMovies] = useState([]);
 
+  const handleRemoveFromFavorites = (movieId) => {
+    fetch(
+      `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${
+        user.Username
+      }/movies/${encodeURIComponent(movieId)}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        if (!response.ok) {
+          // Attempt to read the response text and throw it as an error
+          return response.text().then((text) => {
+            throw new Error(text);
+          });
+        }
+        // return response.json(); // Assume JSON response on successful deletion
+      })
+      .then(() => {
+        console.log(user.FavoriteMovies, "FavoriteMovies");
+        const newFavorites = user?.FavoriteMovies?.filter(
+          (id) => id != movieId
+        );
+        const newUserData = {
+          ...user,
+          FavoriteMovies: newFavorites,
+        };
+        localStorage.setItem("user", JSON.stringify(newUserData));
+        console.log(newUserData, "newUserData");
+        setUser(newUserData); // Update the local user state
+        setFavoriteMovies(
+          movies.filter(
+            (movie) =>
+              newUserData.FavoriteMovies &&
+              newUserData.FavoriteMovies.includes(movie._id)
+          )
+        );
+        alert("Movie removed from favorites successfully!");
+      })
+      .catch((error) => {
+        console.error("Failed to remove movie from favorites:", error);
+        alert(`Failed to remove movie from favorites: ${error.message}`);
+      });
+  };
+
   useEffect(() => {
     if (!token || !localUser.Username) return; // Check if there's a valid token and username
 
@@ -180,9 +229,7 @@ const ProfileView = ({ localUser, movies, token }) => {
                 movie={movie}
                 isFavorite={user.FavoriteMovies.includes(movie._id)}
                 onAddToFavorites={() => handleAddToFavorites(movie._id)}
-                onRemoveFromFavorites={() =>
-                  handleRemoveFromFavorites(movie._id)
-                }
+                handleRemoveFromFavorites={handleRemoveFromFavorites}
               />
             </Col>
           ))
