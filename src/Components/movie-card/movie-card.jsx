@@ -4,7 +4,7 @@ import { Button, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "./movie-card.scss";
 
-export const MovieCard = ({ movie, isFavorite }) => {
+export const MovieCard = ({ movie, isFavorite, handleRemoveFromFavorites }) => {
   const storedToken = localStorage.getItem("token");
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const [user, setUser] = useState(storedUser ? storedUser : null);
@@ -43,38 +43,38 @@ export const MovieCard = ({ movie, isFavorite }) => {
       });
   };
 
-  const handleRemoveFromFavorites = (movieId) => {
-    fetch(
-      `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${
-        user.Username
-      }/movies/${encodeURIComponent(movie._id)}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    )
-      .then((response) => {
-        if (!response.ok) {
-          // Attempt to read the response text and throw it as an error
-          return response.text().then((text) => {
-            throw new Error(text);
-          });
-        }
-        return response.json(); // Assume JSON response on successful deletion
-      })
-      .then((updatedUser) => {
-        alert("Movie removed from favorites successfully!");
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-        setUser(updatedUser); // Update the local user state
-      })
-      .catch((error) => {
-        console.error("Failed to remove movie from favorites:", error);
-        alert(`Failed to remove movie from favorites: ${error.message}`);
-      });
-  };
+  // const handleRemoveFromFavorites = (movieId) => {
+  //   fetch(
+  //     `https://movie-ghibli-api-60afc8eabe21.herokuapp.com/users/${
+  //       user.Username
+  //     }/movies/${encodeURIComponent(movie._id)}`,
+  //     {
+  //       method: "DELETE",
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         "Content-Type": "application/json",
+  //       },
+  //     }
+  //   )
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         // Attempt to read the response text and throw it as an error
+  //         return response.text().then((text) => {
+  //           throw new Error(text);
+  //         });
+  //       }
+  //       return response.json(); // Assume JSON response on successful deletion
+  //     })
+  //     .then((updatedUser) => {
+  //       alert("Movie removed from favorites successfully!");
+  //       localStorage.setItem("user", JSON.stringify(updatedUser));
+  //       setUser(updatedUser); // Update the local user state
+  //     })
+  //     .catch((error) => {
+  //       console.error("Failed to remove movie from favorites:", error);
+  //       alert(`Failed to remove movie from favorites: ${error.message}`);
+  //     });
+  // };
 
   return (
     <>
@@ -96,7 +96,7 @@ export const MovieCard = ({ movie, isFavorite }) => {
             <Button
               className="remove-button"
               variant="danger"
-              onClick={handleRemoveFromFavorites}
+              onClick={() => handleRemoveFromFavorites(movie._id)}
             >
               Remove from Favorites
             </Button>
